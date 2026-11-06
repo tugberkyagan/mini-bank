@@ -22,7 +22,7 @@ jobs:
         run: ./mvnw -B verify
       - name: Build Docker image
         run: docker build -t mini-bank:${{ github.sha }} .
-      - name: Log in to GHRC
+      - name: Log in to GHCR
         if: github.event_name == 'push'
         uses: docker/login-action@v3
         with:
@@ -32,5 +32,5 @@ jobs:
       - name: Push image
         if: github.event_name == 'push'
         run: |
-          docker tag mini-bank:${{ gihub.sha }} ghcr.io/tugberkyagan/mini-bank:${{ github.sha }}
+          docker tag mini-bank:${{ github.sha }} ghcr.io/tugberkyagan/mini-bank:${{ github.sha }}
           docker push ghcr.io/tugberkyagan/mini-bank:${{ github.sha }}
