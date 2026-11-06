@@ -27,6 +27,7 @@ class AccountControllerTest {
         mockMvc.get("/accounts/5000")
             .andExpect {
                 status { isNotFound() }
+                jsonPath("$.message") { value("No account with id 5000 exists.") }
             }
     }
 
@@ -35,6 +36,7 @@ class AccountControllerTest {
         mockMvc.get("/accounts/abc")
             .andExpect {
                 status { isBadRequest() }
+                jsonPath("$.message") { value("Invalid value for 'id'") }
             }
     }
 
@@ -43,6 +45,7 @@ class AccountControllerTest {
         mockMvc.get("/accounts/-5")
             .andExpect {
                 status { isBadRequest() }
+                jsonPath("$.message") { value("Value must be positive") }
             }
     }
 }
