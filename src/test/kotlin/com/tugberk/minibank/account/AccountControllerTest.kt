@@ -23,28 +23,31 @@ class AccountControllerTest {
     }
 
     @Test
-    fun `throws exception when id is not found`() {
+    fun `returns 404 when account does not exist`() {
         mockMvc.get("/accounts/5000")
             .andExpect {
                 status { isNotFound() }
+                jsonPath("$.code") { value("ACCOUNT_NOT_FOUND") }
                 jsonPath("$.message") { value("No account with id 5000 exists.") }
             }
     }
 
     @Test
-    fun `throws exception when id is abc as invalid`() {
+    fun `returns 400 when id is not a number`() {
         mockMvc.get("/accounts/abc")
             .andExpect {
                 status { isBadRequest() }
+                jsonPath("$.code") { value("INVALID_PARAMETER") }
                 jsonPath("$.message") { value("Invalid value for 'id'") }
             }
     }
 
     @Test
-    fun `throws exception when id is negative number`() {
+    fun `returns 400 when id is not positive`() {
         mockMvc.get("/accounts/-5")
             .andExpect {
                 status { isBadRequest() }
+                jsonPath("$.code") { value("INVALID_PARAMETER") }
                 jsonPath("$.message") { value("Value must be positive") }
             }
     }
