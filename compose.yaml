@@ -1,0 +1,20 @@
+name: mini-bank-db
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      - POSTGRES_DB=minibank
+      - POSTGRES_USER=minibank
+      - POSTGRES_PASSWORD=minibank
+    ports:
+      - "5332:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U minibank -d minibank" ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+volumes:
+  db-data:
