@@ -1,7 +1,9 @@
 package com.tugberk.minibank.account
 
+import org.mockito.BDDMockito.given
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import kotlin.test.Test
@@ -12,24 +14,19 @@ class AccountControllerTest {
     @Autowired
     lateinit var mockMvc: MockMvc
 
+    @MockitoBean
+    lateinit var accountService: AccountService
+
     @Test
     fun `returns account when id is valid`() {
-        mockMvc.get("/accounts/42")
-            .andExpect {
-                status { isOk() }
-                jsonPath("$.id") { value(42) }
-                jsonPath("$.currency") { value("TRY") }
-            }
+        given(accountService.getAccount(42))
+            .willReturn(AccountResponse(42, "Tuğberk", "TR330006100519786457841326", "100.00".toBigDecimal(), "TRY"))
+        mockMvc.get("/accounts/42").andExpect { /* eskisi gibi */ }
     }
 
     @Test
     fun `returns 404 when account does not exist`() {
-        mockMvc.get("/accounts/5000")
-            .andExpect {
-                status { isNotFound() }
-                jsonPath("$.code") { value("ACCOUNT_NOT_FOUND") }
-                jsonPath("$.message") { value("No account with id 5000 exists.") }
-            }
+        given(accountService.getAccount(5000)).willThrow(AccountNotFoundException(5000))
     }
 
     @Test

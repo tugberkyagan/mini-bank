@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
 import com.tugberk.minibank.account.AccountNotFoundException
+import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.method.annotation.HandlerMethodValidationException
 
 @RestControllerAdvice
@@ -35,4 +37,15 @@ class GlobalExceptionHandler {
     fun handleValidation(e: HandlerMethodValidationException): ResponseEntity<ErrorResponse> =
         ResponseEntity.badRequest()
             .body(ErrorResponse("INVALID_PARAMETER", "Value must be positive"))
+
+    @ExceptionHandler(MethodArgumentNotValidException::class)
+    fun handleInvalidRequestBody(e: MethodArgumentNotValidException): ResponseEntity<ErrorResponse> =
+        ResponseEntity.badRequest()
+            .body(ErrorResponse("VALIDATION_FAILED",
+                e.bindingResult.fieldErrors.joinToString { "${it.field}: ${it.defaultMessage}" }))
+
+    @ExceptionHandler(DataIntegrityViolationException::class)
+    fun handleDataIntegrityViolation(e: DataIntegrityViolationException): ResponseEntity<ErrorResponse> =
+        ResponseEntity.status(HttpStatus.CONFLICT)
+            .body(ErrorResponse("CONFLICT", "Request conflicts with existing data"))
 }

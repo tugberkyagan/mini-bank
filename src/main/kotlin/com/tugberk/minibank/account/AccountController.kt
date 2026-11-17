@@ -1,26 +1,25 @@
 package com.tugberk.minibank.account
 
+import jakarta.validation.Valid
 import jakarta.validation.constraints.Positive
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/accounts")
-class AccountController {
+class AccountController(private val accountService: AccountService) {
 
     @GetMapping("/{id}")
     fun getAccount(@PathVariable @Positive id: Long): AccountResponse {
-        if (id > 1000){
-            throw AccountNotFoundException(id)
-        }
-        return AccountResponse(
-            id = id,
-            owner = "Tuğberk Yağan",
-            iban = "TR330006100519786457841326",
-            balance = "1500.75".toBigDecimal(),
-            currency = "TRY"
-        )
+        return accountService.getAccount(id)
+    }
+
+    @PostMapping
+    fun createAccount(@Valid @RequestBody request: CreateAccountRequest): AccountResponse {
+        return accountService.createAccount(request)
     }
 }
