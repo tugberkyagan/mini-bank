@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 import jakarta.persistence.Version
+import org.hibernate.annotations.Generated
 import java.math.BigDecimal
 import java.time.OffsetDateTime
 
@@ -32,6 +33,7 @@ class Account (
     @Version
     val version: Long = 0
 
+    @Generated
     @Column(insertable = false, updatable = false)
     val createdAt: OffsetDateTime? = null
 }

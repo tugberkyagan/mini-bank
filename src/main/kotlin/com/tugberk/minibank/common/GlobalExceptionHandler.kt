@@ -7,8 +7,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
 import com.tugberk.minibank.account.AccountNotFoundException
+import com.tugberk.minibank.transfer.InsufficientFundsException
+import com.tugberk.minibank.transfer.InvalidTransferException
+import com.tugberk.minibank.transfer.TransferNotFoundException
 import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.web.bind.MethodArgumentNotValidException
+import org.springframework.web.bind.MissingRequestHeaderException
 import org.springframework.web.method.annotation.HandlerMethodValidationException
 
 @RestControllerAdvice
@@ -20,6 +25,11 @@ class GlobalExceptionHandler {
     fun handleAccountNotFound(e: AccountNotFoundException): ResponseEntity<ErrorResponse> =
         ResponseEntity.status(HttpStatus.NOT_FOUND)
             .body(ErrorResponse("ACCOUNT_NOT_FOUND", "No account with id ${e.id} exists."))
+
+    @ExceptionHandler(TransferNotFoundException::class)
+    fun handleTransferNotFound(e: TransferNotFoundException): ResponseEntity<ErrorResponse> =
+        ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body(ErrorResponse("TRANSFER_NOT_FOUND", "No transfer with id ${e.id} exists."))
 
     @ExceptionHandler(MethodArgumentTypeMismatchException::class)
     fun handleTypeMismatch(e: MethodArgumentTypeMismatchException): ResponseEntity<ErrorResponse> =
@@ -48,4 +58,23 @@ class GlobalExceptionHandler {
     fun handleDataIntegrityViolation(e: DataIntegrityViolationException): ResponseEntity<ErrorResponse> =
         ResponseEntity.status(HttpStatus.CONFLICT)
             .body(ErrorResponse("CONFLICT", "Request conflicts with existing data"))
+
+    @ExceptionHandler(HttpMessageNotReadableException::class)
+    fun handleUnreadableBody(ex: HttpMessageNotReadableException) =
+        ResponseEntity.badRequest().body(ErrorResponse("MALFORMED_REQUEST", "Request body is missing or malformed"))
+
+    @ExceptionHandler(InsufficientFundsException::class)
+    fun handleInsufficientFunds(ex: InsufficientFundsException) =
+        ResponseEntity.unprocessableContent()
+            .body(ErrorResponse("INSUFFICIENT_FUNDS", ex.message ?: "Insufficient funds"))
+
+    @ExceptionHandler(InvalidTransferException::class)
+    fun handleInvalidTransfer(ex: InvalidTransferException) =
+        ResponseEntity.unprocessableContent()
+            .body(ErrorResponse("INVALID_TRANSFER", ex.message ?: "Invalid transfer"))
+
+    @ExceptionHandler(MissingRequestHeaderException::class)
+    fun handleMissingHeader(ex: MissingRequestHeaderException) =
+        ResponseEntity.badRequest()
+            .body(ErrorResponse("MISSING_HEADER", "Required header '${ex.headerName}' is missing"))
 }

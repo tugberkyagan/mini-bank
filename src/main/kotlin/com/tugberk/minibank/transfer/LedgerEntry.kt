@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import org.hibernate.annotations.Generated
 import java.math.BigDecimal
 import java.time.OffsetDateTime
 
@@ -25,6 +26,7 @@ class LedgerEntry(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null
 
+    @Generated
     @Column(insertable = false, updatable = false)
     val createdAt: OffsetDateTime? = null
 }
