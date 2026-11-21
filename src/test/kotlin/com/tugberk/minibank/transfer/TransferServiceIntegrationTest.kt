@@ -12,6 +12,9 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import java.math.BigDecimal
 import java.util.UUID
+import java.util.concurrent.Callable
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executors
 
 @SpringBootTest
 @Import(TestcontainersConfiguration::class)
@@ -76,5 +79,34 @@ class TransferServiceIntegrationTest @Autowired constructor(
         assertThat(balanceOf(from)).isEqualByComparingTo("100.00")
         assertThat(transferRepository.count()).isZero()
         assertThat(ledgerEntryRepository.count()).isZero()
+    }
+
+    @Test
+    fun `concurrent transfers never overdraw the account`() {
+        val from = account("TR000000000000000000000001", "100.00")
+        val to = account("TR000000000000000000000002", "0.00")
+        val threadCount = 20
+        val executor = Executors.newFixedThreadPool(threadCount)
+        val start = CountDownLatch(1)
+
+        val futures = (1..threadCount).map {
+            executor.submit(Callable {
+                start.await()
+                try {
+                    transferService.createTransfer(UUID.randomUUID(), request(from, to, "10.00"))
+                    true
+                } catch (e: InsufficientFundsException) {
+                    false
+                }
+            })
+        }
+        start.countDown()
+        val successCount = futures.count { it.get() }
+        executor.shutdown()
+
+        assertThat(successCount).isEqualTo(10)
+        assertThat(balanceOf(from)).isEqualByComparingTo("0.00")
+        assertThat(balanceOf(to)).isEqualByComparingTo("100.00")
+        assertThat(ledgerEntryRepository.count()).isEqualTo(20)
     }
 }
