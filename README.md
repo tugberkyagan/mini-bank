@@ -1,4 +1,5 @@
-### MiniBank
+# MiniBank
+![CI](https://github.com/tugberkyagan/mini-bank/actions/workflows/ci.yml/badge.svg)
 
 A small banking backend: accounts, idempotent money transfers and a double-entry ledger. Built to practise production concerns such as concurrency, idempotency and CI/CD.
 
@@ -20,7 +21,7 @@ Kotlin · Spring Boot 4 · Java 21 · PostgreSQL 17 · Flyway · Spring Data JPA
 Requirements: JDK 21, Docker
 
 
-```
+```bash
 docker compose up -d      # PostgreSQL on localhost:5332
 ./mvnw spring-boot:run    # API on localhost:8080
 ./mvnw verify             # run all tests (Docker must be running)
@@ -29,14 +30,14 @@ docker compose up -d      # PostgreSQL on localhost:5332
 ### API examples
 
 #### Create an account
-```
+```bash
 curl -X POST localhost:8080/accounts \
 -H 'Content-Type: application/json' \
 -d '{"ownerName":"Alice","iban":"TR330006100519786457841326","currency":"TRY"}'
 ```
 
 #### Transfer money
-```
+```bash
 curl -X POST localhost:8080/transfers \
 -H 'Content-Type: application/json' \
 -H "Idempotency-Key: $(uuidgen)" \
@@ -61,6 +62,3 @@ curl -X POST localhost:8080/transfers \
 - Transactional outbox + Kafka events
 - Observability (metrics, tracing)
 - Kubernetes deployment (kind)
-
-
-------
