@@ -1,5 +1,6 @@
 package com.tugberk.minibank.account
 
+import com.tugberk.minibank.deposit.DepositService
 import org.mockito.BDDMockito.given
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
@@ -16,6 +17,9 @@ class AccountControllerTest {
 
     @MockitoBean
     lateinit var accountService: AccountService
+
+    @MockitoBean
+    lateinit var depositService: DepositService
 
     @Test
     fun `returns account when id is valid`() {

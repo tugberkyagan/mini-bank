@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
 import com.tugberk.minibank.account.AccountNotFoundException
+import com.tugberk.minibank.deposit.DepositNotFoundException
+import com.tugberk.minibank.deposit.InvalidDepositException
 import com.tugberk.minibank.transfer.InsufficientFundsException
 import com.tugberk.minibank.transfer.InvalidTransferException
 import com.tugberk.minibank.transfer.TransferNotFoundException
@@ -30,6 +32,11 @@ class GlobalExceptionHandler {
     fun handleTransferNotFound(e: TransferNotFoundException): ResponseEntity<ErrorResponse> =
         ResponseEntity.status(HttpStatus.NOT_FOUND)
             .body(ErrorResponse("TRANSFER_NOT_FOUND", "No transfer with id ${e.id} exists."))
+
+    @ExceptionHandler(DepositNotFoundException::class)
+    fun handleDepositNotFound(e: DepositNotFoundException): ResponseEntity<ErrorResponse> =
+        ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body(ErrorResponse("DEPOSIT_NOT_FOUND", "No deposit with id ${e.id} exists."))
 
     @ExceptionHandler(MethodArgumentTypeMismatchException::class)
     fun handleTypeMismatch(e: MethodArgumentTypeMismatchException): ResponseEntity<ErrorResponse> =
@@ -72,6 +79,11 @@ class GlobalExceptionHandler {
     fun handleInvalidTransfer(ex: InvalidTransferException) =
         ResponseEntity.unprocessableContent()
             .body(ErrorResponse("INVALID_TRANSFER", ex.message ?: "Invalid transfer"))
+
+    @ExceptionHandler(InvalidDepositException::class)
+    fun handleInvalidDeposit(ex: InvalidDepositException) =
+        ResponseEntity.unprocessableContent()
+            .body(ErrorResponse("INVALID_DEPOSIT", ex.message ?: "Invalid deposit"))
 
     @ExceptionHandler(MissingRequestHeaderException::class)
     fun handleMissingHeader(ex: MissingRequestHeaderException) =

@@ -3,6 +3,7 @@ package com.tugberk.minibank.transfer
 import com.tugberk.minibank.TestcontainersConfiguration
 import com.tugberk.minibank.account.Account
 import com.tugberk.minibank.account.AccountRepository
+import com.tugberk.minibank.deposit.DepositRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -23,11 +24,13 @@ class TransferServiceIntegrationTest @Autowired constructor(
     private val accountRepository: AccountRepository,
     private val transferRepository: TransferRepository,
     private val ledgerEntryRepository: LedgerEntryRepository,
+    private val depositRepository: DepositRepository,
 ) {
     @BeforeEach
     fun cleanUp() {
         ledgerEntryRepository.deleteAll()
         transferRepository.deleteAll()
+        depositRepository.deleteAll()
         accountRepository.deleteAll()
     }
 

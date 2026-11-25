@@ -21,6 +21,9 @@ class LedgerEntry(
 
     @Column(updatable = false)
     val transferId: Long? = null,
+
+    @Column(updatable = false)
+    val depositId: Long? = null,
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
